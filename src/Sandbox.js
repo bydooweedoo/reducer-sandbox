@@ -14,6 +14,11 @@ let sandboxcount = -1;
  */
 function Sandbox (reducer, customid, customkey) {
     const sandboxid = String(customid || ++sandboxcount);
+    const isAction = action => (
+        typeof action === 'object' ||
+        typeof action.type === 'string'
+    );
+    const isInit = action => !action.type.indexOf('@@');
     const params = (
         customkey ?
         ObjectPath.create(customkey, sandboxid) :
@@ -33,7 +38,7 @@ function Sandbox (reducer, customid, customkey) {
 
         reducer: (state, action) => {
             return (
-                !action || getSandboxValue(action) === sandboxid ?
+                !isAction(action) || isInit(action) || getSandboxValue(action) === sandboxid ?
                 reducer(state, action) :
                 reducer(state, {})
             );
