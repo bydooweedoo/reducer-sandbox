@@ -27,6 +27,7 @@
   "author": "bydooweedoo <bydooweedoo@gmail.com>",
   "license": "PRIVATE",
   "dependencies": {
+    "ramda": "^0.19.1"
   },
   "devDependencies": {
     "expect": "^1.14.0",
