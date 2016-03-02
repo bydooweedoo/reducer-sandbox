@@ -90,6 +90,16 @@ describe('reducer-sandbox', () => {
             return expect(params.mykey.length).toBeGreaterThan(0);
         });
 
+        it('should accept multilevel path (a.b.c)', () => {
+            const params = reducerSandbox.keyParams('a.b.c');
+
+            expect(params).toBeA('object');
+            expect(params.a).toBeA('object');
+            expect(params.a.b).toBeA('object');
+            expect(params.a.b.c).toBeA('string');
+            return expect(params.a.b.c.length).toBeGreaterThan(0);
+        });
+
     });
 
     describe('#getid', () => {
@@ -111,6 +121,8 @@ describe('reducer-sandbox', () => {
             const id = reducerSandbox.getid({
                 mykey: '100',
             }, 'mykey');
+
+            console.log(id);
 
             expect(id).toBeA('string');
             return expect(id).toEqual('100');

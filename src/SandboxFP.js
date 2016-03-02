@@ -62,12 +62,18 @@ const isInitAction = R.both(
         R.pipe(R.indexOf('@@'), R.equals(0))
     )
 );
+const createPath = R.compose(R.lensPath, R.split('.'));
+const setToPath = R.curry((path, value, obj) => R.set(
+    createPath(path), value, obj)
+);
+const getFromPath = R.curry((path, obj) => R.prop(createPath(path), obj));
+
 const keyParams = R.cond([
-    [R.is(String), key => R.objOf(key, sandboxid())],
+    [R.is(String), key => setToPath(key, sandboxid(), {})],
     [R.T, R.compose(R.objOf('sandbox'), sandboxid)]
 ]);
 const getsandboxid = (action, key) => R.cond([
-    [R.is(String), R.curry(R.prop)(R.__, action)],
+    [R.is(String), getFromPath(R.__, action)],
     [R.T, R.always(R.prop('sandbox', action))]
 ])(key);
 const sandbox = () => null;
