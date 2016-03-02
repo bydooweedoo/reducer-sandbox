@@ -3,9 +3,10 @@
 /**
  * @alias module:reducer-sandbox
  */
+
 const R = require('ramda');
-const ObjectPath = require('./ObjectPath');
-let sandboxcount = -1;
+const _action = require('./action');
+const _keypath = require('./keypath');
 
 /**
  * @param {Function} reducer - Reducer to sandbox.
@@ -48,38 +49,33 @@ function Sandbox (reducer, customid, customkey) {
     };
 }
 
+const matchSandbox = R.curry((id, key, action) => R.anyPass([
+    _action.isNot,
+    _action.isInit,
+    R.compose(R.equals(id), R.curry(getsandboxid)(R.__, key))
+])(action));
+
+const reducer = (id, key, f) => (state, action) => R.cond([
+    [matchSandbox(id, key), R.curry(f)(state)],
+    [R.T, R.pipe(R.curry(f)(state), R.empty)],
+])(action);
 
 const counter = num => () => String(++num);
+
 const sandboxid = counter(-1);
-const isAction = R.both(
-    R.is(Object),
-    R.pipe(R.prop('type'), R.is(String))
-);
-const isInitAction = R.both(
-    isAction,
-    R.pipe(
-        R.prop('type'),
-        R.pipe(R.indexOf('@@'), R.equals(0))
-    )
-);
-const createPath = R.compose(R.lensPath, R.split('.'));
-const setToPath = R.curry((path, value, obj) => R.set(
-    createPath(path), value, obj)
-);
-const getFromPath = R.curry((path, obj) => R.prop(createPath(path), obj));
 
 const keyParams = R.cond([
-    [R.is(String), key => setToPath(key, sandboxid(), {})],
+    [R.is(String), key => _keypath.setTo(key, sandboxid(), {})],
     [R.T, R.compose(R.objOf('sandbox'), sandboxid)]
 ]);
+
 const getsandboxid = (action, key) => R.cond([
-    [R.is(String), getFromPath(R.__, action)],
+    [R.is(String), _keypath.getFrom(R.__, action)],
     [R.T, R.always(R.prop('sandbox', action))]
 ])(key);
+
 const sandbox = () => null;
 
-sandbox.isInitAction = isInitAction;
-sandbox.isAction = isAction;
 sandbox.counter = counter;
 sandbox.nextid = sandboxid;
 sandbox.getid = getsandboxid;

@@ -26,48 +26,6 @@ describe('reducer-sandbox', () => {
 
     });
 
-    describe('#isAction', () => {
-
-        it('should be a function', () => {
-            return expect(reducerSandbox.isAction).toBeA('function');
-        });
-
-        it('should returns true if valid action given', () => {
-            return expect(reducerSandbox.isAction({
-                type: 'TEST',
-            })).toBe(true);
-        });
-
-        it('should returns false if not valid action given', () => {
-            expect(reducerSandbox.isAction()).toBe(false);
-            expect(reducerSandbox.isAction(true)).toBe(false);
-            expect(reducerSandbox.isAction([])).toBe(false);
-            return expect(reducerSandbox.isAction({})).toBe(false);
-        });
-    });
-
-    describe('#isInitAction', () => {
-
-        it('should be a function', () => {
-            return expect(reducerSandbox.isInitAction).toBeA('function');
-        });
-
-        it('should returns true if valid action given', () => {
-            return expect(reducerSandbox.isInitAction({
-                type: '@@redux/INIT',
-            })).toBe(true);
-        });
-
-        it('should returns false if not valid action given', () => {
-            expect(reducerSandbox.isInitAction()).toBe(false);
-            expect(reducerSandbox.isInitAction(true)).toBe(false);
-            expect(reducerSandbox.isInitAction([])).toBe(false);
-            return expect(reducerSandbox.isInitAction({
-                type: 'ANOTHER_ACTION',
-            })).toBe(false);
-        });
-    });
-
     describe('#keyParams', () => {
 
         it('should be a function', () => {
