@@ -1,24 +1,58 @@
-'use strict';
+import R from 'ramda';
 
-const R = require('ramda');
-
-const is = R.both(
+/**
+ * Returns true if given object is an action, else false.
+ *
+ *      isAction({type: 'INCREMENT'}) //=> true
+ *      isAction({type: 'ADD', payload: 1}) //=> true
+ *      isAction({metadata: true}) //=> false
+ *      isAction({}) //=> false
+ *      isAction(false) //=> false
+ */
+export const isAction = R.both(
     R.is(Object),
     R.pipe(R.prop('type'), R.is(String))
 );
 
-const isNot = R.compose(R.not, is);
+/**
+ * Returns true if given object is not an action, else false.
+ *
+ *      isNotAction({type: 'INCREMENT'}) //=> false
+ *      isNotAction({type: 'ADD', payload: 1}) //=> false
+ *      isNotAction({metadata: true}) //=> true
+ *      isNotAction({}) //=> true
+ *      isNotAction(false) //=> true
+ */
+export const isNotAction = R.complement(isAction);
 
-const isInit = R.both(is, R.pipe(
+/**
+ * Returns true if given object is an init action, else false.
+ *
+ *      isInitAction({type: '@@INIT'}) //=> true
+ *      isInitAction({type: '@@ADD', payload: 1}) //=> true
+ *      isInitAction({type: 'INIT'}) //=> false
+ *      isInitAction({}) //=> false
+ *      isInitAction(false) //=> false
+ */
+export const isInitAction = R.both(isAction, R.pipe(
     R.prop('type'),
     R.pipe(R.indexOf('@@'), R.equals(0))
 ));
 
-const isNotInit = R.compose(R.not, isInit);
+/**
+ * Returns true if given object is not an init action, else false.
+ *
+ *      isNotInitAction({type: '@@INIT'}) //=> false
+ *      isNotInitAction({type: '@@ADD', payload: 1}) //=> false
+ *      isNotInitAction({type: 'INIT'}) //=> true
+ *      isNotInitAction({}) //=> true
+ *      isNotInitAction(false) //=> true
+ */
+export const isNotInitAction = R.complement(isInitAction);
 
-module.exports = {
-    is,
-    isInit,
-    isNot,
-    isNotInit,
+export default {
+    isAction,
+    isInitAction,
+    isNotAction,
+    isNotInitAction,
 };
