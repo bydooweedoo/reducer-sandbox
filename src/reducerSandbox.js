@@ -20,7 +20,7 @@ const createReducer = (sandboxMatchAction, reducer) => (state, action) => (
     reducer(state, action) : state
 );
 
-const createSandboxID = counter(-1);
+const createSandboxID = counter(0);
 
 const createDispatcher = sandboxParams => store => action => store.dispatch(
     R.merge(action, sandboxParams)
@@ -37,6 +37,12 @@ const sandbox = (reducer, options = {}) => {
     const key = defaults(prop('key', options), R.always('sandbox'));
     const sandboxParams = setToKeyPath(key, id, {});
     const sandboxMatchAction = createSandboxMatchAction(id, key);
+
+    /**
+     * Bind sandbox params to given action.
+     *
+     *      bindToAction({type: 'TEST'}) //=> {type: 'TEST', sandbox: '1'}
+     */
     const bindToAction = bindParamsToAction(sandboxParams);
     const bindToActionCreator = actionCreator => (
         R.pipe(actionCreator, bindToAction)
@@ -48,11 +54,11 @@ const sandbox = (reducer, options = {}) => {
     return {
         id,
         key,
+        bindToAction,
+        bindToActionCreator,
+        bindToActionCreators,
         dispatcher: createDispatcher(sandboxParams),
         reducer: createReducer(sandboxMatchAction, R.curryN(2, reducer)),
-        bindToAction: bindToAction,
-        bindToActionCreator: bindToActionCreator,
-        bindToActionCreators: bindToActionCreators,
     };
 };
 
