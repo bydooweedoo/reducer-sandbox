@@ -231,8 +231,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *      const simplePath = createKeyPathAt('a');
 	 *      const nestedPath = createKeyPathAt('a.b.c');
 	 *
-	 *      setToKeyPath(simplePath, 'OK', {}); //=> {a: 'OK'}
-	 *      setToKeyPath(nestedPath, 'OK', {}); //=> {a: {b: {c: 'OK'}}}
+	 *      R.set(simplePath, 'OK', {}); //=> {a: 'OK'}
+	 *      R.set(nestedPath, 'OK', {}); //=> {a: {b: {c: 'OK'}}}
+	 *      R.set(simplePath, 'updated', {a: true, b: false}); //=> {a: 'updated', b: false}
 	 */
 	var createKeyPathAt = exports.createKeyPathAt = _ramda2.default.compose(_ramda2.default.lensPath, _ramda2.default.split('.'));
 
@@ -240,9 +241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Set given value at given path for given object.
 	 * If value already exists for given path, override it.
 	 *
-	 *      const path = createKeyPathAt('a.b.c');
-	 *
-	 *      setToKeyPath(path, 'OK', {}); //=> {a: {b: {c: 'OK'}}}
+	 *      setToKeyPath('a.b.c', 'OK', {}); //=> {a: {b: {c: 'OK'}}}
 	 */
 	var setToKeyPath = exports.setToKeyPath = _ramda2.default.curry(function (path, value, obj) {
 	  return _ramda2.default.set(createKeyPathAt(path), value, obj);
@@ -252,10 +251,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Get value from given object at given path.
 	 * Returns undefined if path does not exists.
 	 *
-	 *      const path = createKeyPathAt('a.b.c');
-	 *
-	 *      getFromKeyPath(path, {a: {b: {c: 'OK'}}}); //=> 'OK'
-	 *      getFromKeyPath(path, {a: true}); //=> undefined
+	 *      getFromKeyPath('a.b.c', {a: {b: {c: 'OK'}}}); //=> 'OK'
+	 *      getFromKeyPath('a.b.c', {a: true}); //=> undefined
 	 */
 	var getFromKeyPath = exports.getFromKeyPath = _ramda2.default.curry(function (path, obj) {
 	  return _ramda2.default.view(createKeyPathAt(path), obj);

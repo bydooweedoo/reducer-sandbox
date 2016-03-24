@@ -1,7 +1,7 @@
 {
   "name": "reducer-sandbox",
   "version": "1.0.0",
-  "description": "Allows to reuse your reducers in different place without conflict them.",
+  "description": "Allows to reuse your redux reducers in different place without conflict them.",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
   "files": [
