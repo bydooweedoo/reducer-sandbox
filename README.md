@@ -91,7 +91,7 @@ const reducers = redux.combineReducers({
 });
 const store = reducer.createStore(reducers);
 
-// now if you want to only increment statsCounter, you have two choices.
+// now if you want to only increment statsCounter, you have 4 choices.
 
 // First is using bindToAction helper:
 store.dispatch(statsCounter.bindToAction({type: 'INCREMENT'}));
@@ -104,9 +104,24 @@ const dispatchStatsCounter = statsCounter.dispatcher(store);
 dispatchStatsCounter({type: 'INCREMENT'});
 // statsCounter.counter = 2
 // itemsCounter.counter = 0
-```
 
-> _See also_ `reducer-chain` in order to chain given reducers with same given state and action.
+// Third is using bindToActionCreator helper:
+const makeIncrement = () => {type: 'INCREMENT'};
+const makeStatsIncrement = statsCounter.bindToActionCreator(makeIncrement);
+
+store.dispatch(makeStatsIncrement());
+// statsCounter.counter = 3
+// itemsCounter.counter = 0
+
+// Fourth is using bindToActionCreators helper:
+const actions = {
+  increment: () => {type: 'INCREMENT'},
+  decrement: () => {type: 'DECREMENT'},
+};
+const statsActions = statsCounter.bindToActionCreators(actions);
+
+store.dispatch(statsActions.increment());
+```
 
 ## Examples
 

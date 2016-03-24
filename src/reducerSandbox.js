@@ -37,13 +37,22 @@ const sandbox = (reducer, options = {}) => {
     const key = defaults(prop('key', options), R.always('sandbox'));
     const sandboxParams = setToKeyPath(key, id, {});
     const sandboxMatchAction = createSandboxMatchAction(id, key);
+    const bindToAction = bindParamsToAction(sandboxParams);
+    const bindToActionCreator = actionCreator => (
+        R.pipe(actionCreator, bindToAction)
+    );
+    const bindToActionCreators = R.map(
+        R.ifElse(R.is(Function), bindToActionCreator, R.identity)
+    );
 
     return {
         id,
         key,
         dispatcher: createDispatcher(sandboxParams),
         reducer: createReducer(sandboxMatchAction, R.curryN(2, reducer)),
-        bindToAction: bindParamsToAction(sandboxParams),
+        bindToAction: bindToAction,
+        bindToActionCreator: bindToActionCreator,
+        bindToActionCreators: bindToActionCreators,
     };
 };
 

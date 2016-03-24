@@ -314,6 +314,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	};
 
+	var bindParamsToAction = function bindParamsToAction(params) {
+	    return _ramda2.default.ifElse(_ramda2.default.is(Object), _ramda2.default.merge(_ramda2.default.__, params), _ramda2.default.pipe(_ramda2.default.always(params), _ramda2.default.clone));
+	};
+
 	var sandbox = function sandbox(reducer) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -326,7 +330,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        id: id,
 	        key: key,
 	        dispatcher: createDispatcher(sandboxParams),
-	        reducer: createReducer(sandboxMatchAction, _ramda2.default.curryN(2, reducer))
+	        reducer: createReducer(sandboxMatchAction, _ramda2.default.curryN(2, reducer)),
+	        bindToAction: bindParamsToAction(sandboxParams)
 	    };
 	};
 

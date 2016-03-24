@@ -309,4 +309,149 @@ describe('reducer-sandbox', () => {
 
     });
 
+    describe('#Api.bindToActionCreator', () => {
+
+        const reducer = () => {};
+        const id = 'sandbox-id';
+        const key = 'sandbox-key';
+        const actionWithoutKey = {type: 'TEST'};
+        const actionWithKey = {type: 'TEST', [key]: 'original'};
+        const doActionWithoutKey = () => actionWithoutKey;
+        const doActionWithKey = () => actionWithKey;
+
+        it('should return function', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+
+            expect(sandbox.bindToActionCreator(doActionWithoutKey)).toBeA(Function);
+        });
+
+        it('should call original action creator once', () => {
+            const action = {working: true};
+            const actionSpy = expect.createSpy().andReturn(action);
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const doAction = sandbox.bindToActionCreator(actionSpy);
+
+            doAction();
+            expect(actionSpy).toHaveBeenCalled();
+            expect(actionSpy.calls.length).toEqual(1);
+        });
+
+        it('should call original action creator with given arguments', () => {
+            const action = {working: true};
+            const actionSpy = expect.createSpy().andReturn(action);
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const doAction = sandbox.bindToActionCreator(actionSpy);
+            const arg1 = {a: 1};
+            const arg2 = new Date();
+
+            doAction(arg1, arg2);
+            expect(actionSpy).toHaveBeenCalledWith(arg1, arg2);
+        });
+
+        it('should bind returned action without key/id to sandbox', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const doAction = sandbox.bindToActionCreator(doActionWithoutKey);
+
+            expect(doAction()).toEqual({
+                type: 'TEST',
+                [key]: id,
+            });
+        });
+
+        it('should bind returned action with key/id to sandbox', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const doAction = sandbox.bindToActionCreator(doActionWithKey);
+
+            expect(doAction()).toEqual({
+                type: 'TEST',
+                [key]: id,
+            });
+        });
+
+    });
+
+    describe('#Api.bindToActionCreators', () => {
+
+        const reducer = () => {};
+        const id = 'sandbox-id';
+        const key = 'sandbox-key';
+        const actionWithoutKey = {type: 'TEST'};
+        const actionWithKey = {type: 'TEST', [key]: 'original'};
+        const doActionWithoutKey = () => actionWithoutKey;
+        const doActionWithKey = () => actionWithKey;
+        const actions = {
+            doActionWithoutKey,
+            doActionWithKey,
+        };
+
+        it('should return an object', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+
+            expect(sandbox.bindToActionCreators(actions)).toBeAn(Object);
+        });
+
+        it('should return same object key as given', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const result = sandbox.bindToActionCreators(actions);
+
+            expect(result.doActionWithKey).toBeA(Function);
+            expect(result.doActionWithoutKey).toBeA(Function);
+        });
+
+        it('should not change non-function value', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const obj = {working: true};
+            const notAllActions = R.merge({test: obj}, actions);
+            const result = sandbox.bindToActionCreators(notAllActions);
+
+            expect(result.test).toBe(obj);
+        });
+
+        it('should be able to take an array', () => {
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const spy = expect.createSpy().andReturn(true);
+            const listOfActions = [spy, spy];
+            const result = sandbox.bindToActionCreators(listOfActions);
+
+            expect(result).toBeAn(Array);
+            expect(result.length).toEqual(2);
+            result[0]('test');
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should bind to returned action', () => {
+            const spy = expect.createSpy().andReturn({type: 'SPY'});
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const result = sandbox.bindToActionCreators([spy]);
+
+            expect(result[0]()).toEqual({
+                type: 'SPY',
+                [key]: id,
+            });
+        });
+
+        it('should call action creator once', () => {
+            const spy = expect.createSpy().andReturn({type: 'SPY'});
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const result = sandbox.bindToActionCreators([spy]);
+
+            result[0]();
+            expect(spy).toHaveBeenCalled();
+            expect(spy.calls.length).toEqual(1);
+        });
+
+        it('should call action creator with given arguments', () => {
+            const spy = expect.createSpy().andReturn({type: 'SPY'});
+            const sandbox = reducerSandbox(reducer, {id, key});
+            const result = sandbox.bindToActionCreators([spy]);
+            const arg1 = {a: 1};
+            const arg2 = new Date();
+
+            result[0](arg1, arg2);
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(arg1, arg2);
+        });
+
+    });
+
 });
