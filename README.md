@@ -29,12 +29,6 @@ const sandbox = reducerSandbox(counterReducer, {
   key: 'metadata.sandboxid',
   id: 'stats-counter',
 });
-
-sandbox.reducer; //=> sandboxed counterReducer to attach to the store
-sandbox.dispatcher(store)(action); //=> you can use the new dispatch function in order to dispatch action to this sandbox reducer
-store.dispatch(sandbox.bindToAction(action)); //=> or use this to update given action with sandbox metadata
-
-export default sandbox;
 ```
 
 Using ES5
@@ -47,12 +41,6 @@ var sandbox = reducerSandbox(counterReducer, {
   key: 'metadata.sandboxid',
   id: 'stats-counter',
 });
-
-sandbox.reducer; //=> sandboxed counterReducer to attach to the store
-sandbox.dispatcher(store)(action); //=> you can use the new dispatch function in order to dispatch action to this sandbox reducer
-store.dispatch(sandbox.bindToAction(action)); //=> or use this to update given action with sandbox metadata
-
-module.exports = sandbox;
 ```
 
 ## Usage
@@ -67,14 +55,15 @@ const reducers = redux.combineReducers({
   itemsCounter: counterReducer,
 });
 const store = reducer.createStore(reducers);
-
-// this will increment both counter from statsCounter and itemsCounter
-store.dispatch({type: 'INCREMENT'});
-// statsCounter.counter = 1
-// itemsCounter.counter = 1
-
-// if you want to only increment statsCounter, then you can reducer-sandbox.
 ```
+
+This will increment both counter from `statsCounter` and `itemsCounter`:
+```js
+store.dispatch({type: 'INCREMENT'});
+store.getState(); //=> {statsCounter: {counter: 1}, itemsCounter: {counter: 1}}
+```
+
+If you want to only increment `statsCounter`, then you can `reducer-sandbox`.
 
 Let's do it:
 ```js
@@ -91,37 +80,42 @@ const reducers = redux.combineReducers({
 });
 const store = reducer.createStore(reducers);
 
-// now if you want to only increment statsCounter, you have 4 choices.
-
-// First is using bindToAction helper:
-store.dispatch(statsCounter.bindToAction({type: 'INCREMENT'}));
-// statsCounter.counter = 1
-// itemsCounter.counter = 0
-
-// Second is using dispatcher helper:
-const dispatchStatsCounter = statsCounter.dispatcher(store);
-
-dispatchStatsCounter({type: 'INCREMENT'});
-// statsCounter.counter = 2
-// itemsCounter.counter = 0
-
-// Third is using bindToActionCreator helper:
-const makeIncrement = () => {type: 'INCREMENT'};
-const makeStatsIncrement = statsCounter.bindToActionCreator(makeIncrement);
-
-store.dispatch(makeStatsIncrement());
-// statsCounter.counter = 3
-// itemsCounter.counter = 0
-
-// Fourth is using bindToActionCreators helper:
-const actions = {
-  increment: () => {type: 'INCREMENT'},
-  decrement: () => {type: 'DECREMENT'},
-};
-const statsActions = statsCounter.bindToActionCreators(actions);
-
-store.dispatch(statsActions.increment());
+store.getState(); //=> {statsCounter: {counter: 0}, itemsCounter: {counter: 0}}
 ```
+
+Now if you want to only increment `statsCounter`, you have 4 choices.
+
+1. First is using `bindToAction` helper:
+  ```js
+  store.dispatch(statsCounter.bindToAction({type: 'INCREMENT'}));
+  store.getState(); //=> {statsCounter: {counter: 1}, itemsCounter: {counter: 0}}
+  ```
+2. Second is using `dispatcher` helper:
+  ```js
+  const dispatchStatsCounter = statsCounter.dispatcher(store);
+
+  dispatchStatsCounter({type: 'INCREMENT'});
+  store.getState(); //=> {statsCounter: {counter: 2}, itemsCounter: {counter: 0}}
+  ```
+3. Third is using `bindToActionCreator` helper:
+  ```js
+  const increment = () => {type: 'INCREMENT'};
+  const statsIncrement = statsCounter.bindToActionCreator(increment);
+
+  store.dispatch(statsIncrement());
+  store.getState(); //=> {statsCounter: {counter: 3}, itemsCounter: {counter: 0}}
+  ```
+4. Fourth is using `bindToActionCreators` helper:
+  ```js
+  const actions = {
+    increment: () => {type: 'INCREMENT'},
+    decrement: () => {type: 'DECREMENT'},
+  };
+  const statsActions = statsCounter.bindToActionCreators(actions);
+
+  store.dispatch(statsActions.increment());
+  store.getState(); //=> {statsCounter: {counter: 4}, itemsCounter: {counter: 0}}
+  ```
 
 ## Examples
 
