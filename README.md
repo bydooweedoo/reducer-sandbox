@@ -86,18 +86,23 @@ store.getState(); //=> {statsCounter: {counter: 0}, itemsCounter: {counter: 0}}
 Now if you want to only increment `statsCounter`, you have 4 choices.
 
 1. First is using `bindToAction` helper:
+
   ```js
   store.dispatch(statsCounter.bindToAction({type: 'INCREMENT'}));
   store.getState(); //=> {statsCounter: {counter: 1}, itemsCounter: {counter: 0}}
   ```
+
 2. Second is using `dispatcher` helper:
+
   ```js
   const dispatchStatsCounter = statsCounter.dispatcher(store);
 
   dispatchStatsCounter({type: 'INCREMENT'});
   store.getState(); //=> {statsCounter: {counter: 2}, itemsCounter: {counter: 0}}
   ```
+
 3. Third is using `bindToActionCreator` helper:
+
   ```js
   const increment = () => {type: 'INCREMENT'};
   const statsIncrement = statsCounter.bindToActionCreator(increment);
@@ -105,7 +110,9 @@ Now if you want to only increment `statsCounter`, you have 4 choices.
   store.dispatch(statsIncrement());
   store.getState(); //=> {statsCounter: {counter: 3}, itemsCounter: {counter: 0}}
   ```
+
 4. Fourth is using `bindToActionCreators` helper:
+
   ```js
   const actions = {
     increment: () => {type: 'INCREMENT'},

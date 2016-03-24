@@ -304,7 +304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	};
 
-	var createSandboxID = (0, _counter2.default)(-1);
+	var createSandboxID = (0, _counter2.default)(0);
 
 	var createDispatcher = function createDispatcher(sandboxParams) {
 	    return function (store) {
@@ -326,12 +326,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sandboxParams = (0, _keypath.setToKeyPath)(key, id, {});
 	    var sandboxMatchAction = createSandboxMatchAction(id, key);
 
+	    /**
+	     * Bind sandbox params to given action.
+	     *
+	     *      bindToAction({type: 'TEST'}) //=> {type: 'TEST', sandbox: '1'}
+	     */
+	    var bindToAction = bindParamsToAction(sandboxParams);
+	    var bindToActionCreator = function bindToActionCreator(actionCreator) {
+	        return _ramda2.default.pipe(actionCreator, bindToAction);
+	    };
+	    var bindToActionCreators = _ramda2.default.map(_ramda2.default.ifElse(_ramda2.default.is(Function), bindToActionCreator, _ramda2.default.identity));
+
 	    return {
 	        id: id,
 	        key: key,
+	        bindToAction: bindToAction,
+	        bindToActionCreator: bindToActionCreator,
+	        bindToActionCreators: bindToActionCreators,
 	        dispatcher: createDispatcher(sandboxParams),
-	        reducer: createReducer(sandboxMatchAction, _ramda2.default.curryN(2, reducer)),
-	        bindToAction: bindParamsToAction(sandboxParams)
+	        reducer: createReducer(sandboxMatchAction, _ramda2.default.curryN(2, reducer))
 	    };
 	};
 
