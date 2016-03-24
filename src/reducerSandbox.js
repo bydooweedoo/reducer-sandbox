@@ -26,6 +26,12 @@ const createDispatcher = sandboxParams => store => action => store.dispatch(
     R.merge(action, sandboxParams)
 );
 
+const bindParamsToAction = params => R.ifElse(
+    R.is(Object),
+    R.merge(R.__, params),
+    R.pipe(R.always(params), R.clone)
+);
+
 const sandbox = (reducer, options = {}) => {
     const id = defaults(prop('id', options), createSandboxID);
     const key = defaults(prop('key', options), R.always('sandbox'));
@@ -37,6 +43,7 @@ const sandbox = (reducer, options = {}) => {
         key,
         dispatcher: createDispatcher(sandboxParams),
         reducer: createReducer(sandboxMatchAction, R.curryN(2, reducer)),
+        bindToAction: bindParamsToAction(sandboxParams),
     };
 };
 

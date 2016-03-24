@@ -71,6 +71,12 @@ describe('reducer-sandbox', () => {
             expect(api.key).toBeA('string');
         });
 
+        it('should have a bindToAction function', () => {
+            const api = reducerSandbox((state, action) => state);
+
+            expect(api.bindToAction).toBeA(Function);
+        });
+
     });
 
     describe('#Api.key', () => {
@@ -257,6 +263,48 @@ describe('reducer-sandbox', () => {
             api.reducer(initialState, initAction);
             expect(reducerSpy).toHaveBeenCalled();
             expect(reducerSpy.calls.length).toEqual(1);
+        });
+
+    });
+
+    describe('#Api.bindToAction', () => {
+
+        const id = 'sandbox-id';
+        const key = 'sandbox-key';
+        const actionWithoutKey = {type: 'TEST'};
+        const actionWithKey = {type: 'TEST', [key]: 'original'};
+
+        it('should bind given action to sandbox', () => {
+            const sandbox = reducerSandbox(() => {}, {
+                id, key
+            });
+
+            expect(sandbox.bindToAction(actionWithoutKey)).toEqual({
+                type: 'TEST',
+                [key]: id,
+            });
+        });
+
+        it('should override given action key/id if already exists', () => {
+            const sandbox = reducerSandbox(() => {}, {
+                id, key
+            });
+
+            expect(sandbox.bindToAction(actionWithKey)).toEqual({
+                type: 'TEST',
+                [key]: id,
+            });
+        });
+
+        it('should return object with key/id if given argument is not an action', () => {
+            const sandbox = reducerSandbox(() => {}, {
+                id, key
+            });
+
+            expect(sandbox.bindToAction(null)).toEqual({[key]: id});
+            expect(sandbox.bindToAction(undefined)).toEqual({[key]: id});
+            expect(sandbox.bindToAction([])).toEqual({[key]: id});
+            expect(sandbox.bindToAction(1)).toEqual({[key]: id});
         });
 
     });
