@@ -1,13 +1,10 @@
 import R from 'ramda';
+import { dotPath, assocDotPath } from 'ramda-extension';
 import { isNotAction, isInitAction } from './action';
-import { setToKeyPath, getFromKeyPath } from './keypath';
 import { prop, defaults } from './helpers';
 import counter from './counter';
 
-const doesActionKeyEqual = (key, id) => R.pipe(
-    getFromKeyPath(key),
-    R.equals(id)
-);
+const doesActionKeyEqual = R.useWith(R.pipe, [dotPath, R.equals]);
 
 const createSandboxMatchAction = (id, key) => R.anyPass([
     isNotAction,
@@ -35,7 +32,7 @@ const bindParamsToAction = params => R.ifElse(
 const sandbox = (reducer, options = {}) => {
     const id = defaults(prop('id', options), createSandboxID);
     const key = defaults(prop('key', options), R.always('sandbox'));
-    const sandboxParams = setToKeyPath(key, id, {});
+    const sandboxParams = assocDotPath(key, id, {});
     const sandboxMatchAction = createSandboxMatchAction(id, key);
 
     /**
