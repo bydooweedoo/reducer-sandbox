@@ -1,7 +1,7 @@
 import R from 'ramda';
-import { dotPath, assocDotPath } from 'ramda-extension';
+import { dotPath, assocDotPath, isObject, isFunction, equalsLength } from 'ramda-extension';
 import { isNotAction, isInitAction } from './action';
-import { prop, defaults } from './helpers';
+import { defaults } from './helpers';
 import counter from './counter';
 
 const doesActionKeyEqual = R.useWith(R.pipe, [dotPath, R.equals]);
@@ -24,14 +24,14 @@ const createDispatcher = sandboxParams => store => action => store.dispatch(
 );
 
 const bindParamsToAction = params => R.ifElse(
-    R.is(Object),
+    isObject,
     R.merge(R.__, params),
     R.pipe(R.always(params), R.clone)
 );
 
 const sandbox = (reducer, options = {}) => {
-    const id = defaults(prop('id', options), createSandboxID);
-    const key = defaults(prop('key', options), R.always('sandbox'));
+    const id = defaults(R.prop('id', options), createSandboxID);
+    const key = defaults(R.prop('key', options), R.always('sandbox'));
     const sandboxParams = assocDotPath(key, id, {});
     const sandboxMatchAction = createSandboxMatchAction(id, key);
 
@@ -41,11 +41,9 @@ const sandbox = (reducer, options = {}) => {
      *      bindToAction({type: 'TEST'}) //=> {type: 'TEST', sandbox: '1'}
      */
     const bindToAction = bindParamsToAction(sandboxParams);
-    const bindToActionCreator = actionCreator => (
-        R.pipe(actionCreator, bindToAction)
-    );
+    const bindToActionCreator = actionCreator => R.pipe(actionCreator, bindToAction);
     const bindToActionCreators = R.map(
-        R.ifElse(R.is(Function), bindToActionCreator, R.identity)
+        R.when(isFunction, bindToActionCreator)
     );
 
     return {
@@ -62,15 +60,17 @@ const sandbox = (reducer, options = {}) => {
 const applySandbox = R.apply(sandbox);
 
 const hasOneArgWithType = type => R.both(
-    R.pipe(R.length, R.equals(1)),
+    equalsLength(1),
     R.pipe(R.head, R.type, R.equals(type))
 );
 
-const curriedSandbox = R.unapply(R.cond([
-    // 1 argument which are options, we curry sandbox with given options
-    [hasOneArgWithType('Object'), R.apply(R.curryN(2, R.flip(sandbox)))],
+const curriedSandbox = R.unapply(R.ifElse(
+    // 1 argument which are options
+    hasOneArgWithType('Object'),
+    // we curry sandbox with given options
+    R.apply(R.curryN(2, R.flip(sandbox))),
     // default, we call sandbox
-    [R.T, applySandbox],
-]));
+    applySandbox
+));
 
 export default curriedSandbox;

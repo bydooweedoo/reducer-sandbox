@@ -1,5 +1,5 @@
 import R from 'ramda';
-
+import { isObject, isString } from 'ramda-extension';
 /**
  * Returns true if given object is an action, else false.
  *
@@ -10,8 +10,8 @@ import R from 'ramda';
  *      isAction(false) //=> false
  */
 export const isAction = R.both(
-    R.is(Object),
-    R.pipe(R.prop('type'), R.is(String))
+    isObject,
+    R.pipe(R.prop('type'), isString)
 );
 
 /**

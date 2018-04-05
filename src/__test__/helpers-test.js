@@ -1,6 +1,6 @@
 import R from 'ramda';
 import expect from 'expect';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 
 describe('helpers', () => {
     it('should be an object', () => {
@@ -13,8 +13,6 @@ describe('helpers', () => {
         });
 
         it('should returns second argument call result if first is nil', () => {
-            const obj = { test: true };
-
             expect(helpers.defaults(undefined, R.always('DEFAULT'))).toEqual('DEFAULT');
             expect(helpers.defaults(null, R.always('DEFAULT'))).toEqual('DEFAULT');
         });
@@ -28,57 +26,8 @@ describe('helpers', () => {
         });
 
         it('should returns second argument value if it is not a function', () => {
-            const obj = { test: true };
-
             expect(helpers.defaults(undefined, 'DEFAULT')).toEqual('DEFAULT');
             expect(helpers.defaults(null, 'DEFAULT')).toEqual('DEFAULT');
-        });
-    });
-
-    describe('#prop', () => {
-        it('should be a function', () => {
-            expect(helpers.prop).toBeA(Function);
-        });
-
-        it('should returns value at given key if exists', () => {
-            const key = 'test';
-            const obj = { test: 'WORKING' };
-
-            expect(helpers.prop(key, obj)).toEqual('WORKING');
-        });
-
-        it('should returns undefined if key does not exists', () => {
-            const key = 'unknown';
-            const obj = { test: 'WORKING' };
-
-            expect(helpers.prop(key, obj)).toBe(undefined);
-        });
-
-        it('should returns undefined if second argument is not an object', () => {
-            const key = 'test';
-
-            expect(helpers.prop(key, undefined)).toBe(undefined);
-            expect(helpers.prop(key, null)).toBe(undefined);
-            expect(helpers.prop(key, false)).toBe(undefined);
-            expect(helpers.prop(key, 's')).toBe(undefined);
-        });
-    });
-
-    describe('#isNotNil', () => {
-        it('should be a function', () => {
-            expect(helpers.isNotNil).toBeA(Function);
-        });
-
-        it('should returns true if given argument is not nil', () => {
-            expect(helpers.isNotNil([])).toBe(true);
-            expect(helpers.isNotNil({})).toBe(true);
-            expect(helpers.isNotNil(true)).toBe(true);
-            expect(helpers.isNotNil(0)).toBe(true);
-        });
-
-        it('should returns false if given argument is nil', () => {
-            expect(helpers.isNotNil(undefined)).toBe(false);
-            expect(helpers.isNotNil(null)).toBe(false);
         });
     });
 
