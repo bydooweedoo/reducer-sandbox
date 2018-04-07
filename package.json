@@ -52,7 +52,8 @@
   "license": "MIT",
   "repository": "bydooweedoo/reducer-sandbox",
   "dependencies": {
-    "ramda": "^0.19.1"
+    "ramda": "^0.25.0",
+    "ramda-extension": "^0.3.5"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
